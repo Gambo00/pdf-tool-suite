@@ -168,3 +168,29 @@ button:hover, a:hover {
     align-items: flex-start;
   }
 }
+
+.cookie-banner {
+  position: fixed;
+  bottom: 0;
+  width: 100%;
+  background: rgba(0, 0, 0, 0.9);
+  color: white;
+  padding: 1rem;
+  text-align: center;
+  z-index: 10000;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.cookie-banner button {
+  background: gold;
+  color: black;
+  border: none;
+  border-radius: 8px;
+  padding: 0.6rem 1rem;
+  cursor: pointer;
+  font-weight: bold;
+}
