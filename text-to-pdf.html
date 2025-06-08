@@ -44,5 +44,36 @@
     doc.save("text.pdf");
   }
 </script>
+
+<footer>
+  <div class="container">
+    <p>© 2025 PDF Tool Suite – Alle Rechte vorbehalten.</p>
+    <p>
+      <a href="privacy.html">Datenschutzerklärung</a> |
+      <a href="impressum.html">Impressum</a>
+    </p>
+  </div>
+</footer>
+
+<div id="cookie-banner" class="cookie-banner">
+  <p>Wir verwenden Cookies, um Inhalte und Anzeigen zu personalisieren. <a href="privacy.html" target="_blank">Mehr erfahren</a></p>
+  <button onclick="acceptCookies()">Akzeptieren</button>
+</div>
+
+<script>
+  function acceptCookies() {
+    localStorage.setItem('cookiesAccepted', 'true');
+    document.getElementById('cookie-banner').style.display = 'none';
+    // Optional: Google AdSense oder andere Skripte jetzt nachladen
+  }
+
+  window.onload = () => {
+    if (localStorage.getItem('cookiesAccepted') === 'true') {
+      document.getElementById('cookie-banner').style.display = 'none';
+      // Optional: hier Skripte aktivieren
+    }
+  };
+</script>
+
 </body>
 </html>
