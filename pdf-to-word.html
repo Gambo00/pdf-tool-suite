@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PDF zu Text</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.min.js"></script>
+</head>
+<body>
+
+<!-- Direkte Navigation -->
+<div class="navbar">
+  <a href="index.html">🏠 Start</a>
+  <a href="image-to-pdf.html">🖼️ Bild zu PDF</a>
+  <a href="merge-pdf.html">➕ PDF zusammenfügen</a>
+  <a href="text-to-pdf.html">📝 Text zu PDF</a>
+  <a href="pdf-to-word.html">📄 PDF zu Word</a>
+</div>
+
+<header>
+  PDF zu Text Converter
+</header>
+
+<main>
+  <div class="tool-container">
+    <label for="pdfInput">Wähle eine PDF-Datei:</label>
+    <input type="file" id="pdfInput" accept="application/pdf">
+    <button onclick="document.getElementById('pdfInput').click()">PDF auswählen</button>
+
+    <div class="actions">
+      <button onclick="extractText()">Text extrahieren</button>
+    </div>
+
+    <div id="output" style="margin-top: 2rem; white-space: pre-wrap; background: rgba(255,255,255,0.05); padding: 1rem; border-radius: 12px; display:none;"></div>
+    <div class="actions">
+      <button onclick="copyText()" style="display:none;" id="copyBtn">Text kopieren</button>
+    </div>
+  </div>
+</main>
+
+<script>
+  let pdfFile;
+  document.getElementById('pdfInput').addEventListener('change', function(event) {
+    pdfFile = event.target.files[0];
+  });
+
+  async function extractText() {
+    if (!pdfFile) return alert("Bitte wähle zuerst eine PDF-Datei aus.");
+
+    const fileReader = new FileReader();
+    fileReader.onload = async function() {
+      const typedArray = new Uint8Array(this.result);
+      const pdf = await pdfjsLib.getDocument(typedArray).promise;
+
+      let text = '';
+      for (let i = 1; i <= pdf.numPages; i++) {
+        const page = await pdf.getPage(i);
+        const content = await page.getTextContent();
+        text += content.items.map(item => item.str).join(' ') + '\n\n';
+      }
+
+      const output = document.getElementById('output');
+      output.textContent = text;
+      output.style.display = 'block';
+      document.getElementById('copyBtn').style.display = 'inline-block';
+    };
+
+    fileReader.readAsArrayBuffer(pdfFile);
+  }
+
+  function copyText() {
+    const text = document.getElementById('output').textContent;
+    navigator.clipboard.writeText(text).then(() => {
+      alert("Text wurde in die Zwischenablage kopiert!");
+    });
+  }
+</script>
+</body>
+</html>

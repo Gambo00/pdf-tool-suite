@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Bilder zu PDF</title>
+  <link rel="stylesheet" href="style.css" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf-lib/1.17.1/pdf-lib.min.js"></script>
+</head>
+<body>
+<!-- Navigation direkt eingebaut -->
+<div class="navbar">
+  <a href="index.html">🏠 Start</a>
+  <a href="image-to-pdf.html">🖼️ Bild zu PDF</a>
+  <a href="merge-pdf.html">➕ PDF zusammenfügen</a>
+  <a href="text-to-pdf.html">📝 Text zu PDF</a>
+  <a href="pdf-to-word.html">📄 PDF zu Word</a>
+</div>
+<script>
+  fetch('navbar.html')
+    .then(res => res.text())
+    .then(data => document.getElementById('nav-placeholder').innerHTML = data);
+</script>
+
+  <header>
+    <h1>Bilder zu PDF</h1>
+  </header>
+  <main>
+    <div class="tool-container">
+      <label for="imageFiles">Wähle mehrere Bilder oder ziehe sie hierher:</label>
+      <input type="file" id="imageFiles" accept="image/*" multiple />
+      <div id="drop-area" style="border: 2px dashed rgba(255,255,255,0.3); padding: 1rem; border-radius: 12px; margin-top: 1rem; text-align: center;">Ziehe Bilder hierher</div>
+      <button id="addMoreImagesBtn">Weitere Bilder hinzufügen</button>
+      <ul id="imageList"></ul>
+      <div class="actions">
+        <button id="convertBtn">In PDF umwandeln</button>
+        <a id="downloadImagePdf" style="display: none">Download</a>
+        <div class="progress" style="display:none;"><div class="progress-bar" id="progressBar"></div></div>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    const imageInput = document.getElementById('imageFiles');
+    const imageList = document.getElementById('imageList');
+    const convertBtn = document.getElementById('convertBtn');
+    const downloadLink = document.getElementById('downloadImagePdf');
+    const addMoreBtn = document.getElementById('addMoreImagesBtn');
+    const dropArea = document.getElementById('drop-area');
+    const progressBar = document.getElementById('progressBar');
+    let imageArray = [];
+
+    dropArea.addEventListener('dragover', e => {
+      e.preventDefault();
+      dropArea.style.background = 'rgba(255,255,255,0.1)';
+    });
+
+    dropArea.addEventListener('dragleave', () => {
+      dropArea.style.background = 'transparent';
+    });
+
+    dropArea.addEventListener('drop', e => {
+      e.preventDefault();
+      dropArea.style.background = 'transparent';
+      handleImageFiles(e.dataTransfer.files);
+    });
+
+    function handleImageFiles(files) {
+      const newImages = Array.from(files).filter(file => file.type.startsWith('image/'));
+      imageArray = imageArray.concat(newImages);
+      renderImageList();
+    }
+
+    imageInput.addEventListener('change', () => {
+      handleImageFiles(imageInput.files);
+      imageInput.value = '';
+    });
+
+    addMoreBtn.addEventListener('click', () => {
+      imageInput.click();
+    });
+
+    function renderImageList() {
+      imageList.innerHTML = '';
+      imageArray.forEach((file, index) => {
+        const li = document.createElement('li');
+        li.setAttribute('draggable', true);
+        li.innerHTML = `
+          <span>${file.name}</span>
+          <button onclick="moveImageUp(${index})">↑</button>
+          <button onclick="moveImageDown(${index})">↓</button>
+          <button onclick="removeImage(${index})">✖</button>
+        `;
+        li.addEventListener('dragstart', () => li.classList.add('dragging'));
+        li.addEventListener('dragend', () => li.classList.remove('dragging'));
+        li.addEventListener('drop', e => {
+          e.preventDefault();
+          const dragging = document.querySelector('.dragging');
+          const draggedIndex = [...imageList.children].indexOf(dragging);
+          const droppedIndex = [...imageList.children].indexOf(li);
+          const temp = imageArray[draggedIndex];
+          imageArray.splice(draggedIndex, 1);
+          imageArray.splice(droppedIndex, 0, temp);
+          renderImageList();
+        });
+        imageList.appendChild(li);
+      });
+    }
+
+    function moveImageUp(index) {
+      if (index > 0) {
+        [imageArray[index - 1], imageArray[index]] = [imageArray[index], imageArray[index - 1]];
+        renderImageList();
+      }
+    }
+
+    function moveImageDown(index) {
+      if (index < imageArray.length - 1) {
+        [imageArray[index], imageArray[index + 1]] = [imageArray[index + 1], imageArray[index]];
+        renderImageList();
+      }
+    }
+
+    function removeImage(index) {
+      imageArray.splice(index, 1);
+      renderImageList();
+    }
+
+    convertBtn.addEventListener('click', async () => {
+      if (imageArray.length === 0) {
+        alert('Bitte wähle mindestens ein Bild aus.');
+        return;
+      }
+
+      progressBar.parentElement.style.display = 'block';
+      progressBar.style.width = '0%';
+
+      const pdfDoc = await PDFLib.PDFDocument.create();
+
+      for (let i = 0; i < imageArray.length; i++) {
+        const image = imageArray[i];
+        const imgBytes = await image.arrayBuffer();
+        let imgEmbed;
+
+        if (image.type === 'image/png') {
+          imgEmbed = await pdfDoc.embedPng(imgBytes);
+        } else {
+          imgEmbed = await pdfDoc.embedJpg(imgBytes);
+        }
+
+        const page = pdfDoc.addPage([imgEmbed.width, imgEmbed.height]);
+        page.drawImage(imgEmbed, {
+          x: 0,
+          y: 0,
+          width: imgEmbed.width,
+          height: imgEmbed.height,
+        });
+
+        progressBar.style.width = `${((i + 1) / imageArray.length) * 100}%`;
+      }
+
+      const pdfBytes = await pdfDoc.save();
+      const blob = new Blob([pdfBytes], { type: 'application/pdf' });
+      const url = URL.createObjectURL(blob);
+
+      downloadLink.href = url;
+      downloadLink.download = 'images.pdf';
+      downloadLink.textContent = 'PDF herunterladen';
+      downloadLink.style.display = 'inline-block';
+    });
+  </script>
+</body>
+</html>

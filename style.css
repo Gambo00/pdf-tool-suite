@@ -1,0 +1,170 @@
+/* Allgemeines Layout */
+body {
+  margin: 0;
+  font-family: 'Inter', sans-serif;
+  background: linear-gradient(to right, #1f1c2c, #928dab);
+  color: white;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+header {
+  width: 100%;
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(8px);
+  padding: 1rem 2rem;
+  text-align: center;
+  font-size: 1.8rem;
+  font-weight: bold;
+  color: #fff;
+  border-bottom: 1px solid rgba(255,255,255,0.2);
+}
+
+main {
+  flex: 1;
+  width: 100%;
+  max-width: 800px;
+  padding: 2rem;
+  box-sizing: border-box;
+}
+
+/* Werkzeugcontainer */
+.tool-container {
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(6px);
+  padding: 2rem;
+  border-radius: 20px;
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.4);
+}
+
+label {
+  display: block;
+  margin-bottom: 1rem;
+  font-size: 1.1rem;
+  font-weight: 500;
+}
+
+input[type="file"] {
+  display: none;
+}
+
+button, a {
+  background: gold;
+  color: black;
+  border: none;
+  border-radius: 30px;
+  padding: 0.8rem 1.5rem;
+  font-size: 1rem;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background 0.3s ease;
+  margin: 0.5rem 0.3rem;
+  text-decoration: none;
+  display: inline-block;
+}
+
+button:hover, a:hover {
+  background: #ffd700cc;
+}
+
+#fileList, #imageList {
+  list-style: none;
+  padding: 0;
+  margin-top: 1rem;
+}
+
+#fileList li, #imageList li {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: rgba(255,255,255,0.1);
+  padding: 0.7rem 1rem;
+  border-radius: 12px;
+  margin-bottom: 0.5rem;
+  color: white;
+  cursor: grab;
+}
+
+#fileList li.dragging, #imageList li.dragging {
+  opacity: 0.5;
+}
+
+#fileList li button, #imageList li button {
+  background: rgba(255,255,255,0.2);
+  color: white;
+  padding: 0.4rem 0.8rem;
+  font-size: 1rem;
+  border-radius: 50%;
+  border: none;
+  cursor: pointer;
+  margin-left: 0.5rem;
+}
+
+.actions {
+  text-align: center;
+  margin-top: 1.5rem;
+}
+
+.progress {
+  width: 100%;
+  height: 10px;
+  background: rgba(255,255,255,0.2);
+  border-radius: 10px;
+  overflow: hidden;
+  margin-top: 1rem;
+}
+
+.progress-bar {
+  height: 100%;
+  width: 0%;
+  background: gold;
+  transition: width 0.3s ease;
+}
+
+.navbar {
+  width: 100%;
+  background: rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(6px);
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 1rem;
+  padding: 1rem;
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+}
+
+.navbar a {
+  color: white;
+  text-decoration: none;
+  padding: 0.5rem 1rem;
+  background: rgba(255,255,255,0.08);
+  border-radius: 12px;
+  font-weight: bold;
+  transition: background 0.2s ease;
+}
+
+.navbar a:hover {
+  background: rgba(255,255,255,0.2);
+}
+
+/* Mobile Optimierung */
+@media (max-width: 768px) {
+  header h1 {
+    font-size: 1.2rem;
+  }
+  .tool-container {
+    padding: 1rem;
+  }
+  button, a {
+    font-size: 0.9rem;
+    padding: 0.6rem 1rem;
+  }
+  #fileList li, #imageList li {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
